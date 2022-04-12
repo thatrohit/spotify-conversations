@@ -1,8 +1,9 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:lottie/lottie.dart';
 import 'package:spotify_conversations/home/home_controller.dart';
-import 'package:spotify_conversations/models/me.dart';
-import 'package:spotify_sdk/spotify_sdk.dart';
+
+import '../playlists/playlists_view.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -12,24 +13,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool _loading = false;
   final _controller = HomeController();
 
-  Future<String> getAccessToken() async {
-    setState(() {
-      _loading = true;
-    });
-    var authenticationToken = await SpotifySdk.getAuthenticationToken(
-        clientId: "a8b5087ee6bb4bf6beac9b7498727df1",
-        redirectUrl: "https://thatrohit.github.io/test/",
-        scope:
-            "app-remote-control,user-modify-playback-state,playlist-read-private");
-    print("SPOTIFY TOKEN -> $authenticationToken");
-    await _controller.getProfile("Bearer $authenticationToken");
-    setState(() {
-      _loading = false;
-    });
-    return authenticationToken;
+  @override
+  void initState() {
+    super.initState();
+    _makeAsyncCalls();
+  }
+
+  _makeAsyncCalls() async {
+    await _controller.initProfile();
   }
 
   @override
@@ -54,25 +47,39 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.all(12.0),
             child: SizedBox(
               width: 400,
-              child: FilledButton(
-                onPressed: getAccessToken,
-                child: Center(
-                  child: _loading
-                      ? const ProgressRing()
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              'assets/logo.png',
-                              height: 30,
-                              width: 30,
+              child: Observer(
+                builder: (_) => FilledButton(
+                  onPressed: _controller.profile == null
+                      ? _controller.getAccessToken
+                      : () {
+                          Navigator.push(
+                            context,
+                            FluentPageRoute(
+                                builder: (context) => const PlaylistsPage()),
+                          );
+                        },
+                  child: Center(
+                    child: Observer(
+                      builder: (_) => _controller.loading
+                          ? const ProgressRing()
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  'assets/logo.png',
+                                  height: 30,
+                                  width: 30,
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(8, 0, 0, 0),
+                                  child: _controller.profile == null
+                                      ? const Text("Login with Spotify")
+                                      : const Text("Let me in!"),
+                                ),
+                              ],
                             ),
-                            const Padding(
-                              padding: EdgeInsets.fromLTRB(8, 0, 0, 0),
-                              child: Text("Login with Spotify"),
-                            ),
-                          ],
-                        ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -81,30 +88,37 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
             child: SizedBox(
               width: (MediaQuery.of(context).size.width / 3),
-              child: _controller.profile == null
-                  ? const Text("No profile loaded yet",
-                      style: TextStyle(
-                        fontStyle: FontStyle.italic,
-                        color: Colors.white,
-                      ))
-                  : ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.green,
-                        child: Image.network(
-                            _controller.profile?.images?.first.url ?? ""),
+              child: Observer(
+                builder: (_) => _controller.profile == null
+                    ? const Text("No profile loaded yet",
+                        style: TextStyle(
+                          fontStyle: FontStyle.italic,
+                          color: Colors.white,
+                        ))
+                    : TappableListTile(
+                        isThreeLine: true,
+                        onTap: _controller.profile == null
+                            ? null
+                            : _controller.logout,
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.green,
+                          child: Image.network(
+                              _controller.profile?.images?.first.url ?? ""),
+                        ),
+                        title: Text(_controller.profile?.displayName ?? "",
+                            style: const TextStyle(
+                              fontStyle: FontStyle.italic,
+                              color: Colors.white,
+                            )),
+                        subtitle: Text(
+                            "${_controller.profile?.followers?.total ?? "0"} followers\n(not you? click to logout)",
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontStyle: FontStyle.italic,
+                              color: Colors.white,
+                            )),
                       ),
-                      title: Text(_controller.profile?.displayName ?? "",
-                          style: const TextStyle(
-                            fontStyle: FontStyle.italic,
-                            color: Colors.white,
-                          )),
-                      subtitle: Text(
-                          "${_controller.profile?.followers?.total ?? "0"} followers",
-                          style: const TextStyle(
-                            fontStyle: FontStyle.italic,
-                            color: Colors.white,
-                          )),
-                    ),
+              ),
             ),
           ),
           Expanded(

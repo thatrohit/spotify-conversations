@@ -4,6 +4,7 @@ import 'package:spotify_conversations/app_theme.dart';
 import 'package:spotify_conversations/home/home_view.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(FluentApp(
     title: 'Spotify Conversations',
     theme: AppTheme.appTheme,

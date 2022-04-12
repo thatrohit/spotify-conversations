@@ -5,4 +5,6 @@ mixin SpotifyApi {
   };
 
   static const endpointMe = "me/";
+
+  static const endpointMyPlaylists = "me/playlists";
 }

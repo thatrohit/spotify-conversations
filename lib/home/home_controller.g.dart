@@ -39,11 +39,33 @@ mixin _$HomeController on _HomeController, Store {
     });
   }
 
+  final _$initProfileAsyncAction = AsyncAction('_HomeController.initProfile');
+
+  @override
+  Future<void> initProfile() {
+    return _$initProfileAsyncAction.run(() => super.initProfile());
+  }
+
   final _$getProfileAsyncAction = AsyncAction('_HomeController.getProfile');
 
   @override
   Future<Me?> getProfile(String token) {
     return _$getProfileAsyncAction.run(() => super.getProfile(token));
+  }
+
+  final _$getAccessTokenAsyncAction =
+      AsyncAction('_HomeController.getAccessToken');
+
+  @override
+  Future<String> getAccessToken() {
+    return _$getAccessTokenAsyncAction.run(() => super.getAccessToken());
+  }
+
+  final _$logoutAsyncAction = AsyncAction('_HomeController.logout');
+
+  @override
+  Future<void> logout() {
+    return _$logoutAsyncAction.run(() => super.logout());
   }
 
   @override

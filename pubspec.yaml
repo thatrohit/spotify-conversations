@@ -36,8 +36,8 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
-  fonts:
-    - family: Proxima Nova Rg
-      fonts:
-        - asset: fonts/proxima_nova.otf
+  # fonts:
+  #   - family: Proxima Nova Rg
+  #     fonts:
+  #       - asset: fonts/proxima_nova.otf
   

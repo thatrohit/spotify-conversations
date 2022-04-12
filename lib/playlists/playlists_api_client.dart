@@ -1,14 +1,15 @@
 import 'dart:convert';
 
-import 'package:spotify_conversations/home/home_repostiroy.dart';
-import 'package:spotify_conversations/models/me.dart';
+import 'package:spotify_conversations/models/playlists.dart';
+import 'package:spotify_conversations/playlists/playlists_repository.dart';
 import 'package:spotify_conversations/utils/api_helpers.dart';
 import 'package:http/http.dart' as http;
 
-class HomeApiClient implements HomeRepository {
+class PlaylistsApiClient implements PlaylistsRepository {
   @override
-  Future<Me> getProfile(String token) async {
-    final apiRequest = Uri.parse(SpotifyApi.baseUrl + SpotifyApi.endpointMe);
+  Future<Playlists> getCollaborativePlaylists(String token) async {
+    final apiRequest =
+        Uri.parse(SpotifyApi.baseUrl + SpotifyApi.endpointMyPlaylists);
     final authHeader = <String, String>{"Authorization": token};
     final meHeaders = {...SpotifyApi.apiHeaders};
     meHeaders.addEntries(authHeader.entries);
@@ -18,7 +19,7 @@ class HomeApiClient implements HomeRepository {
           "The network returned a failure. Please try again after some time");
     }
     final Map<String, dynamic> parsedJson = jsonDecode(apiResponse.body);
-    final Me result = Me.fromJson(parsedJson);
+    final Playlists result = Playlists.fromJson(parsedJson);
     return result;
   }
 }
