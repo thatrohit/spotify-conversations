@@ -24,10 +24,34 @@ mixin _$PlaylistsController on _PlaylistsController, Store {
     });
   }
 
+  final _$playlistsAtom = Atom(name: '_PlaylistsController.playlists');
+
+  @override
+  Playlists? get playlists {
+    _$playlistsAtom.reportRead();
+    return super.playlists;
+  }
+
+  @override
+  set playlists(Playlists? value) {
+    _$playlistsAtom.reportWrite(value, super.playlists, () {
+      super.playlists = value;
+    });
+  }
+
+  final _$fetchPlaylistsAsyncAction =
+      AsyncAction('_PlaylistsController.fetchPlaylists');
+
+  @override
+  Future<Playlists?> fetchPlaylists() {
+    return _$fetchPlaylistsAsyncAction.run(() => super.fetchPlaylists());
+  }
+
   @override
   String toString() {
     return '''
-loading: ${loading}
+loading: ${loading},
+playlists: ${playlists}
     ''';
   }
 }

@@ -7,13 +7,21 @@ import 'package:http/http.dart' as http;
 
 class PlaylistsApiClient implements PlaylistsRepository {
   @override
-  Future<Playlists> getCollaborativePlaylists(String token) async {
-    final apiRequest =
-        Uri.parse(SpotifyApi.baseUrl + SpotifyApi.endpointMyPlaylists);
+  Future<Playlists> getCollaborativePlaylists(
+      String token, int offset, int limit) async {
+    Map<String, String> query = {
+      "offset": offset.toString(),
+      "limit": limit.toString()
+    };
+    final apiRequest = Uri.parse(SpotifyApi.baseUrl +
+        SpotifyApi.endpointMyPlaylists +
+        "/?" +
+        query.entries.map((e) => '${e.key}=${e.value}').join('&'));
+    //print("REQUEST UPDATED-> ${apiRequest.toString()}");
     final authHeader = <String, String>{"Authorization": token};
-    final meHeaders = {...SpotifyApi.apiHeaders};
-    meHeaders.addEntries(authHeader.entries);
-    final apiResponse = await http.get(apiRequest, headers: meHeaders);
+    final playlistHeaders = {...SpotifyApi.apiHeaders};
+    playlistHeaders.addEntries(authHeader.entries);
+    final apiResponse = await http.get(apiRequest, headers: playlistHeaders);
     if (apiResponse.statusCode != 200) {
       throw Exception(
           "The network returned a failure. Please try again after some time");

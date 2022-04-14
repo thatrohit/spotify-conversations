@@ -33,7 +33,11 @@ abstract class _HomeController with Store {
   @action
   Future<Me?> getProfile(String token) async {
     loading = true;
-    profile = await _apiClient.getProfile(token);
+    try {
+      profile = await _apiClient.getProfile(token);
+    } catch (ex) {
+      print("feching profile failed");
+    }
     loading = false;
     return profile;
   }
@@ -44,8 +48,7 @@ abstract class _HomeController with Store {
     var authenticationToken = await SpotifySdk.getAuthenticationToken(
         clientId: "a8b5087ee6bb4bf6beac9b7498727df1",
         redirectUrl: "https://thatrohit.github.io/test/",
-        scope:
-            "app-remote-control,user-modify-playback-state,playlist-read-private");
+        scope: "playlist-read-collaborative");
     prefs?.setString('token', "Bearer $authenticationToken");
     await getProfile("Bearer $authenticationToken");
     return authenticationToken;
