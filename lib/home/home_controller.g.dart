@@ -39,6 +39,21 @@ mixin _$HomeController on _HomeController, Store {
     });
   }
 
+  final _$errorAtom = Atom(name: '_HomeController.error');
+
+  @override
+  ResponseError? get error {
+    _$errorAtom.reportRead();
+    return super.error;
+  }
+
+  @override
+  set error(ResponseError? value) {
+    _$errorAtom.reportWrite(value, super.error, () {
+      super.error = value;
+    });
+  }
+
   final _$initProfileAsyncAction = AsyncAction('_HomeController.initProfile');
 
   @override
@@ -72,7 +87,8 @@ mixin _$HomeController on _HomeController, Store {
   String toString() {
     return '''
 profile: ${profile},
-loading: ${loading}
+loading: ${loading},
+error: ${error}
     ''';
   }
 }

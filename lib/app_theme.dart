@@ -21,8 +21,22 @@ class AppTheme {
 
   static TextStyle heroTextStyle = const TextStyle(
     color: AppColors.white,
-    fontSize: 24,
-    fontWeight: FontWeight.bold,
-    letterSpacing: 3,
+    fontSize: 62,
+    fontWeight: FontWeight.w800,
+  );
+
+  static TextStyle runningText = const TextStyle(
+    fontSize: 12,
+    color: Colors.white,
+  );
+
+  static TextStyle heroRunningText = const TextStyle(
+    fontSize: 22,
+    color: Colors.white,
+  );
+
+  static TextStyle runningTextSubtext = const TextStyle(
+    fontSize: 10,
+    color: Colors.white,
   );
 }

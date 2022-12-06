@@ -1,6 +1,7 @@
 import 'package:mobx/mobx.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spotify_conversations/home/home_api_client.dart';
+import 'package:spotify_conversations/models/response.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
 
 import '../models/me.dart';
@@ -19,6 +20,9 @@ abstract class _HomeController with Store {
 
   SharedPreferences? prefs;
 
+  @observable
+  ResponseError? error;
+
   @action
   Future<void> initProfile() async {
     loading = true;
@@ -34,9 +38,11 @@ abstract class _HomeController with Store {
   Future<Me?> getProfile(String token) async {
     loading = true;
     try {
-      profile = await _apiClient.getProfile(token);
+      var response = await _apiClient.getProfile(token);
+      profile = response.responseObject;
+      error = response.error;
     } catch (ex) {
-      print("feching profile failed");
+      print("fetching profile failed");
     }
     loading = false;
     return profile;

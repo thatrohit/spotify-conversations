@@ -39,6 +39,21 @@ mixin _$PlaylistsController on _PlaylistsController, Store {
     });
   }
 
+  final _$isHoveredAtom = Atom(name: '_PlaylistsController.isHovered');
+
+  @override
+  bool get isHovered {
+    _$isHoveredAtom.reportRead();
+    return super.isHovered;
+  }
+
+  @override
+  set isHovered(bool value) {
+    _$isHoveredAtom.reportWrite(value, super.isHovered, () {
+      super.isHovered = value;
+    });
+  }
+
   final _$fetchPlaylistsAsyncAction =
       AsyncAction('_PlaylistsController.fetchPlaylists');
 
@@ -51,7 +66,8 @@ mixin _$PlaylistsController on _PlaylistsController, Store {
   String toString() {
     return '''
 loading: ${loading},
-playlists: ${playlists}
+playlists: ${playlists},
+isHovered: ${isHovered}
     ''';
   }
 }

@@ -16,6 +16,9 @@ abstract class _PlaylistsController with Store {
   @observable
   Playlists? playlists;
 
+  @observable
+  bool isHovered = false;
+
   final PlaylistsApiClient _apiClient = PlaylistsApiClient();
 
   @action
@@ -28,21 +31,21 @@ abstract class _PlaylistsController with Store {
       int limit = 5;
       List<Items> items = [];
       Playlists? tempPlaylists;
-      //print("called fetchPlaylists. token -> $token");
+      print("called fetchPlaylists. token -> $token");
       do {
         tempPlaylists =
-            await _apiClient.getCollaborativePlaylists(token, offset, limit);
-        if (tempPlaylists.items != null) {
-          items.addAll(tempPlaylists.items!
-              .where((element) => element.collaborative == true));
+            (await _apiClient.getCollaborativePlaylists(token, offset, limit))
+                .responseObject;
+        if (tempPlaylists?.items != null) {
+          items.addAll(tempPlaylists!.items!.where((element) => true));
         }
-        //print("tempPlaylists.next -> ${tempPlaylists.next}");
-        if (tempPlaylists.next != null) {
-          Uri next = Uri.parse(tempPlaylists.next!);
+        print("tempPlaylists.next -> ${tempPlaylists?.next}");
+        if (tempPlaylists?.next != null) {
+          Uri next = Uri.parse(tempPlaylists!.next!);
           offset = int.parse(next.queryParameters["offset"] ?? "0");
-          //print("next offset -> $offset");
+          print("next offset -> $offset");
         } else {
-          tempPlaylists.items = items;
+          tempPlaylists?.items = items;
           playlists = tempPlaylists;
           break;
         }
@@ -51,6 +54,10 @@ abstract class _PlaylistsController with Store {
       print("failed to get playlists. ${ex.toString()}");
     }
     loading = false;
+    print(
+        "nostalgia props -> ${playlists?.items?[0].name} | ${playlists?.items?[0].collaborative} | ${playlists?.items?[0].owner?.displayName}");
+    print(
+        "yeh suno props -> ${playlists?.items?[2].name} | ${playlists?.items?[2].collaborative} | ${playlists?.items?[2].owner?.displayName}");
     return playlists;
   }
 }

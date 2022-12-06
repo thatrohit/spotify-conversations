@@ -7,4 +7,8 @@ mixin SpotifyApi {
   static const endpointMe = "me/";
 
   static const endpointMyPlaylists = "me/playlists";
+
+  static endpointPlaylistDetails(String playlistId) => "playlists/$playlistId";
+
+  static endpointTracks(String playlistId) => "playlists/$playlistId/tracks";
 }

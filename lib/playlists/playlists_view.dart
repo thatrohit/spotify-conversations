@@ -1,11 +1,16 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:spotify_conversations/app_colors.dart';
+import 'package:spotify_conversations/app_theme.dart';
 import 'package:spotify_conversations/models/playlists.dart';
+import 'package:spotify_conversations/playlist_details/details_view.dart';
 import 'package:spotify_conversations/playlists/playlists_controller.dart';
 
+import '../models/me.dart';
+
 class PlaylistsPage extends StatefulWidget {
-  const PlaylistsPage({Key? key}) : super(key: key);
+  Me? me;
+  PlaylistsPage(this.me, {Key? key}) : super(key: key);
 
   @override
   State<PlaylistsPage> createState() => _PlaylistsPageState();
@@ -31,34 +36,74 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
       color: Colors.black,
       child: Align(
         alignment: Alignment.center,
-        child: SizedBox(
+        child: Container(
+          color: AppColors.grayBG2,
           width: 800,
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  "WIP collab playlists page",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
+                Container(
+                  height: 400,
+                  width: 800,
+                  child: Container(
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.me?.displayName ?? "No Name",
+                            style: AppTheme.heroTextStyle,
+                          ),
+                          Text(
+                            "Your Collaborative Playlists",
+                            style: AppTheme.heroRunningText,
+                          )
+                        ],
+                      ),
+                    ),
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          AppColors.grayBG2,
+                        ],
+                      ),
+                    ),
+                  ),
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: NetworkImage(
+                        widget.me?.images?.first.url ?? "",
+                      ),
+                    ),
                   ),
                 ),
                 Expanded(
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      return Observer(
-                        builder: (_) => GridView.builder(
-                          itemCount: _controller.playlists?.items?.length ?? 0,
-                          itemBuilder: (context, index) =>
-                              ItemTile(_controller.playlists?.items?[index]),
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 4,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 20, 12, 12),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return Observer(
+                          builder: (_) => GridView.builder(
+                            itemCount:
+                                _controller.playlists?.items?.length ?? 0,
+                            itemBuilder: (context, index) =>
+                                ItemTile(_controller.playlists?.items?[index]),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 4,
+                              mainAxisExtent: 240,
+                            ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
                 )
               ],
@@ -70,58 +115,78 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
   }
 }
 
-class ItemTile extends StatelessWidget {
+class ItemTile extends StatefulWidget {
   final Items? playlist;
 
-  const ItemTile(
-    this.playlist,
-  );
+  const ItemTile(this.playlist);
 
   @override
+  State<ItemTile> createState() => _ItemTileState();
+}
+
+class _ItemTileState extends State<ItemTile> {
+  bool highlight = false;
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-            image: NetworkImage(
-              playlist?.images?.first.url ?? "",
-            ),
-            fit: BoxFit.cover),
-        color: AppColors.primary,
-        borderRadius: BorderRadius.circular(4),
-        boxShadow: const [
-          BoxShadow(
-              color: Colors.black, offset: const Offset(0, 2), blurRadius: 6)
-        ],
-      ),
-      height: 200,
-      width: 200,
-      margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-      child: Column(children: [
-        Expanded(
-          child: Container(),
-        ),
-        Container(
-          color: AppColors.primary,
-          child: ListTile(
-            leading: const Icon(FluentIcons.music_note),
-            title: Text(
-              playlist?.name ?? "N/A",
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.white,
-              ),
-            ),
-            subtitle: Text(
-              "- ${playlist?.owner?.displayName ?? 'N/A'}",
-              style: TextStyle(
-                fontSize: 10,
-                fontStyle: FontStyle.italic,
-                color: Colors.white,
-              ),
-            ),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          FluentPageRoute(
+              builder: (context) => DetailsView(
+                  widget.playlist?.name ?? "Unnamed Playlist",
+                  widget.playlist?.images?.first.url ?? "",
+                  widget.playlist?.id ?? "")),
+        );
+      },
+      child: MouseRegion(
+        onEnter: (e) => setState(() {
+          highlight = true;
+        }),
+        onExit: (e) => setState(() {
+          highlight = false;
+        }),
+        child: Container(
+          decoration: BoxDecoration(
+            color: AppColors.grayBG,
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: [
+              highlight
+                  ? const BoxShadow(color: AppColors.primary, blurRadius: 8)
+                  : const BoxShadow(color: Colors.transparent, blurRadius: 0)
+            ],
           ),
-        )
-      ]),
+          margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+          child: Column(
+            children: [
+              Container(
+                margin: const EdgeInsets.fromLTRB(0, 12, 0, 0),
+                width: 160,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    widget.playlist?.images?.first.url ?? "",
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                child: ListTile(
+                  title: Text(
+                    widget.playlist?.name ?? "N/A",
+                    style: AppTheme.runningText,
+                  ),
+                  subtitle: Text(
+                    "By ${widget.playlist?.owner?.displayName ?? 'N/A'}",
+                    style: AppTheme.runningTextSubtext,
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

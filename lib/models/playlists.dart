@@ -55,7 +55,7 @@ class Items {
   List<Images>? images;
   String? name;
   Owner? owner;
-  Null? primaryColor;
+  String? primaryColor;
   bool? public;
   String? snapshotId;
   Tracks? tracks;
