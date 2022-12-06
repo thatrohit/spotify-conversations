@@ -4,6 +4,7 @@ import 'package:spotify_conversations/playlist_details/details_controller.dart';
 
 import '../app_colors.dart';
 import '../app_theme.dart';
+import '../models/playlist_details.dart';
 
 class DetailsView extends StatefulWidget {
   final String? profilePhotoUrl;
@@ -15,6 +16,30 @@ class DetailsView extends StatefulWidget {
 
   @override
   State<DetailsView> createState() => _DetailsViewState();
+}
+
+class TrackTile extends StatelessWidget {
+  final Track? selectedTrack;
+  const TrackTile(this.selectedTrack, {Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Container(
+        margin: const EdgeInsets.fromLTRB(0, 12, 0, 0),
+        width: 160,
+        height: 160,
+        child: Image.network(
+          selectedTrack?.album?.images?.first.url ?? "",
+          fit: BoxFit.cover,
+        ),
+      ),
+      title: Text(
+        "${selectedTrack?.artists?.first.name} - ${selectedTrack?.name}",
+        style: AppTheme.runningText,
+      ),
+    );
+  }
 }
 
 class _DetailsViewState extends State<DetailsView> {
@@ -87,7 +112,14 @@ class _DetailsViewState extends State<DetailsView> {
                     padding: const EdgeInsets.fromLTRB(12, 20, 12, 12),
                     child: LayoutBuilder(
                       builder: (context, constraints) {
-                        return Observer(builder: (_) => Column());
+                        return Observer(
+                            builder: (_) => ListView.builder(
+                                itemCount: _controller.tracks?.items?.length,
+                                itemBuilder: (context, index) {
+                                  final selectedTrack =
+                                      _controller.tracks?.items?[index].track;
+                                  return TrackTile(selectedTrack);
+                                }));
                       },
                     ),
                   ),
