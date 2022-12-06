@@ -53,7 +53,7 @@ abstract class _DetailsController with Store {
       print("failed to get tracks for playlist");
     }
     for (var trk in tracks!.items!) {
-      print("${trk.track?.artists?.first.name} - ${trk.track?.name}}");
+      print("${trk.track?.artists?.first.name} - ${trk.track?.name}");
     }
     return tracks;
   }
